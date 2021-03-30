@@ -1,0 +1,29 @@
+  ---
+  - name: Create ansible user, needed for Ansible Tower
+    hosts: all
+    tasks:
+      - name: Add ansible group
+        group:
+          name: ansible
+          gid: 12004
+          state: present
+      - name: Create ansible user
+        user:
+          name: ansible
+          uid: 12004
+          shell: /bin/bash 
+          group: ansible
+          #groups: 
+          #append: yes
+          comment: "NL/S/*AABUNX/IBM/Ansible Deployer TA"
+          state: present
+
+      - name: add the user to the list of users that should not be removed by CMS
+        shell: /usr/local/bin/add_protectedid ansible
+      
+      - name: Set authorized key
+        authorized_key:
+          user: ansible
+          state: present
+          key: "{{ lookup('file', '/home/ansible/.ssh/id_rsa.pub') }}"
+
